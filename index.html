@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rio Panels — One-click tools & motion for After Effects</title>
+<meta name="description" content="Two ScriptUI panels for After Effects. Rio Tools turns the repetitive 80% into single buttons. Rio Flow gives you easing presets and a live curve editor." />
+<link rel="icon" type="image/png" href="assets/logo.png" />
+<meta property="og:title" content="Rio Panels — tools & motion for After Effects" />
+<meta property="og:description" content="Remove the clicks and the work starts moving on its own." />
+<meta property="og:image" content="assets/logo.png" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<style>
+  :root{
+    --ink:#15110D;
+    --ink-2:#1B1611;
+    --panel:#211A14;
+    --line:#322820;
+    --line-soft:#271F18;
+    --rust:#C2521B;
+    --rust-bright:#E8803C;
+    --rust-deep:#8F3A12;
+    --cream:#F6E4D2;
+    --cream-dim:#E5D2BE;
+    --muted:#A2917F;
+    --muted-2:#7C6E60;
+    /* in-product signal colours, used only on panel tags */
+    --tools-blue:#4790FF;
+    --flow-gold:#FAC719;
+
+    --maxw:1120px;
+    --display:"Fraunces", Georgia, serif;
+    --body:"Inter", system-ui, sans-serif;
+    --mono:"JetBrains Mono", ui-monospace, monospace;
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--cream);
+    font-family:var(--body);
+    font-size:17px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+
+  /* ---------- utility type ---------- */
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--muted-2);
+  }
+  .mono{font-family:var(--mono)}
+
+  /* ---------- nav ---------- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    backdrop-filter:blur(10px);
+    background:color-mix(in srgb, var(--ink) 86%, transparent);
+    border-bottom:1px solid var(--line-soft);
+  }
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand img{width:30px;height:30px;border-radius:7px}
+  .brand b{font-family:var(--mono);font-weight:700;font-size:15px;letter-spacing:.04em}
+  .navlinks{display:flex;gap:28px;align-items:center;font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:var(--muted)}
+  .navlinks a{transition:color .2s}
+  .navlinks a:hover{color:var(--cream)}
+  .navlinks .gh{
+    border:1px solid var(--line);border-radius:999px;padding:7px 15px;color:var(--cream);
+    transition:border-color .2s,background .2s;
+  }
+  .navlinks .gh:hover{border-color:var(--rust);background:color-mix(in srgb,var(--rust) 14%,transparent)}
+  @media(max-width:720px){.navlinks a:not(.gh){display:none}}
+
+  /* ---------- hero ---------- */
+  .hero{position:relative;padding:88px 0 64px}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+  @media(max-width:880px){.hero-grid{grid-template-columns:1fr;gap:40px}}
+
+  .hero h1{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:clamp(44px,7vw,78px);
+    line-height:.98;
+    letter-spacing:-.02em;
+    margin:18px 0 22px;
+    color:var(--cream);
+  }
+  .hero h1 em{font-style:italic;color:var(--rust-bright)}
+  .hero p.lead{font-size:19px;color:var(--cream-dim);max-width:30ch;margin:0 0 30px}
+  .cta-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .btn{
+    font-family:var(--mono);font-size:13.5px;letter-spacing:.03em;
+    padding:13px 22px;border-radius:10px;border:1px solid transparent;cursor:pointer;
+    transition:transform .15s ease, background .2s, border-color .2s;
+    display:inline-flex;align-items:center;gap:9px;
+  }
+  .btn-primary{background:var(--rust);color:#fff;box-shadow:0 6px 22px -10px var(--rust)}
+  .btn-primary:hover{background:var(--rust-bright);transform:translateY(-2px)}
+  .btn-ghost{border-color:var(--line);color:var(--cream)}
+  .btn-ghost:hover{border-color:var(--rust);transform:translateY(-2px)}
+
+  .hero-meta{margin-top:34px;display:flex;gap:26px;flex-wrap:wrap}
+  .hero-meta div{font-family:var(--mono);font-size:12px;color:var(--muted-2);letter-spacing:.04em}
+  .hero-meta b{display:block;font-size:22px;color:var(--cream);letter-spacing:0;margin-bottom:2px}
+
+  /* signature: easing curve card */
+  .curve-card{
+    background:linear-gradient(160deg,var(--ink-2),#100C09);
+    border:1px solid var(--line);border-radius:18px;padding:26px;
+    position:relative;overflow:hidden;
+  }
+  .curve-card::before{
+    content:"";position:absolute;inset:0;
+    background:radial-gradient(120% 90% at 80% 0%, color-mix(in srgb,var(--rust) 16%,transparent), transparent 60%);
+    pointer-events:none;
+  }
+  .curve-card .ctop{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;position:relative}
+  .curve-card .ctop span{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted-2)}
+  .curve-card .ctag{color:var(--flow-gold)}
+  .curve-svg{width:100%;height:auto;display:block}
+  .curve-read{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:14px;position:relative}
+  .curve-read b{color:var(--cream)}
+
+  /* ---------- generic section ---------- */
+  section.band{padding:84px 0;border-top:1px solid var(--line-soft)}
+  .seclabel{display:flex;align-items:center;gap:12px;margin-bottom:30px}
+  .seclabel .bar{width:14px;height:3px;background:var(--rust);border-radius:2px}
+  h2{font-family:var(--display);font-weight:600;font-size:clamp(28px,4vw,40px);letter-spacing:-.01em;line-height:1.08;margin:0 0 18px;color:var(--cream)}
+  .sub{color:var(--muted);max-width:62ch}
+
+  /* ---------- manifesto ---------- */
+  .manifesto{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+  @media(max-width:760px){.manifesto{grid-template-columns:1fr;gap:28px}}
+  .manifesto .big{font-family:var(--display);font-size:clamp(26px,3.4vw,36px);line-height:1.18;color:var(--cream);font-weight:500}
+  .manifesto .big em{font-style:italic;color:var(--rust-bright)}
+  .note{border-left:2px solid var(--line);padding:4px 0 4px 22px;margin:0 0 24px}
+  .note .k{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--rust);margin-bottom:8px}
+  .note p{margin:0;color:var(--cream-dim);font-size:16px}
+
+  /* ---------- panel cards ---------- */
+  .panels{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+  @media(max-width:880px){.panels{grid-template-columns:1fr}}
+  .pcard{
+    background:var(--ink-2);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    display:flex;flex-direction:column;transition:border-color .25s,transform .25s;
+  }
+  .pcard:hover{border-color:var(--rust-deep);transform:translateY(-3px)}
+  .pcard .shot{background:#0d0a08;padding:22px;display:flex;justify-content:center;border-bottom:1px solid var(--line-soft)}
+  .pcard .shot img{max-height:340px;width:auto;border-radius:8px}
+  .pcard .body{padding:24px 24px 28px}
+  .pcard .tag{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+  .pcard.tools .tag{color:var(--tools-blue)}
+  .pcard.flow .tag{color:var(--flow-gold)}
+  .pcard h3{font-family:var(--display);font-weight:600;font-size:26px;margin:8px 0 10px;color:var(--cream)}
+  .pcard p{margin:0 0 18px;color:var(--muted);font-size:15.5px}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{font-family:var(--mono);font-size:11.5px;color:var(--cream-dim);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 9px}
+
+  /* ---------- breakdown ---------- */
+  .breakdown{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:8px}
+  @media(max-width:760px){.breakdown{grid-template-columns:1fr}}
+  .feat{border:1px solid var(--line);border-radius:12px;padding:18px 20px;background:var(--ink-2)}
+  .feat .h{display:flex;align-items:baseline;gap:10px;margin-bottom:7px}
+  .feat .dot{width:8px;height:8px;border-radius:2px;flex:0 0 auto;position:relative;top:1px}
+  .feat .n{font-family:var(--mono);font-size:13px;letter-spacing:.06em;color:var(--cream);text-transform:uppercase}
+  .feat .c{font-family:var(--mono);font-size:11px;color:var(--muted-2);margin-left:auto}
+  .feat p{margin:0;font-size:14.5px;color:var(--muted);line-height:1.5}
+
+  /* ---------- install ---------- */
+  .install-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:8px}
+  @media(max-width:760px){.install-grid{grid-template-columns:1fr}}
+  .code{
+    background:#0d0a08;border:1px solid var(--line);border-radius:12px;overflow:hidden;
+  }
+  .code .ct{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2);
+    padding:12px 16px;border-bottom:1px solid var(--line-soft);display:flex;justify-content:space-between}
+  .code pre{margin:0;padding:16px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.75;color:var(--cream-dim)}
+  .code pre .p{color:var(--rust-bright)}
+  .code pre .c{color:var(--muted-2)}
+  .steps{counter-reset:s;list-style:none;padding:0;margin:22px 0 0}
+  .steps li{counter-increment:s;position:relative;padding:10px 0 10px 42px;border-bottom:1px solid var(--line-soft);color:var(--cream-dim);font-size:15.5px}
+  .steps li::before{content:counter(s,decimal-leading-zero);position:absolute;left:0;top:10px;font-family:var(--mono);font-size:12px;color:var(--rust);border:1px solid var(--line);border-radius:6px;width:28px;height:24px;display:flex;align-items:center;justify-content:center}
+  .steps li:last-child{border-bottom:none}
+  .steps code{font-family:var(--mono);font-size:13px;background:var(--panel);padding:2px 6px;border-radius:5px;color:var(--cream)}
+
+  /* ---------- closing ---------- */
+  .closing{text-align:center;max-width:680px;margin:0 auto}
+  .closing .pull{font-family:var(--display);font-weight:500;font-style:italic;font-size:clamp(24px,3.4vw,34px);line-height:1.3;color:var(--cream)}
+  .closing .pull span{color:var(--rust-bright)}
+  .closing .by{margin-top:18px;font-family:var(--mono);font-size:13px;color:var(--muted-2);letter-spacing:.04em}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--line-soft);padding:40px 0}
+  footer .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+  footer .l{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:12px;color:var(--muted-2)}
+  footer .l img{width:24px;height:24px;border-radius:6px}
+  footer .status{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+  footer .status .d{width:8px;height:8px;border-radius:50%;background:#38CC7D;box-shadow:0 0 8px #38cc7d}
+  footer a:hover{color:var(--cream)}
+
+  :focus-visible{outline:2px solid var(--rust-bright);outline-offset:3px;border-radius:4px}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand">
+      <img src="assets/logo.png" alt="Rio logo" />
+      <b>RIO&nbsp;PANELS</b>
+    </div>
+    <div class="navlinks">
+      <a href="#why">why</a>
+      <a href="#panels">panels</a>
+      <a href="#install">install</a>
+      <a class="gh" href="https://github.com/YOUR_USERNAME/rio-panels" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">After Effects · ScriptUI · ExtendScript</div>
+      <h1>Stop clicking.<br><em>Start moving.</em></h1>
+      <p class="lead">Two After Effects panels that turn the repetitive 80% of editing into a single button — so the time goes to the idea, not the busywork.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#install">Install the panels</a>
+        <a class="btn btn-ghost" href="https://github.com/YOUR_USERNAME/rio-panels" target="_blank" rel="noopener">View source ↗</a>
+      </div>
+      <div class="hero-meta">
+        <div><b>2</b>focused panels</div>
+        <div><b>35</b>one-click actions</div>
+        <div><b>15</b>easing presets</div>
+        <div><b>MIT</b>open source</div>
+      </div>
+    </div>
+
+    <!-- signature: live easing curve (a nod to Rio Flow) -->
+    <div class="curve-card">
+      <div class="ctop">
+        <span>Rio&nbsp;Flow · curve</span>
+        <span class="ctag mono">ease ▸ overshoot</span>
+      </div>
+      <svg class="curve-svg" viewBox="0 0 360 220" role="img" aria-label="Animated easing curve">
+        <defs>
+          <linearGradient id="cg" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0" stop-color="#C2521B"/>
+            <stop offset="1" stop-color="#FAC719"/>
+          </linearGradient>
+        </defs>
+        <!-- grid -->
+        <g stroke="#2a2118" stroke-width="1">
+          <line x1="30" y1="20" x2="30" y2="190"/>
+          <line x1="30" y1="190" x2="340" y2="190"/>
+          <line x1="107" y1="20" x2="107" y2="190" opacity=".5"/>
+          <line x1="184" y1="20" x2="184" y2="190" opacity=".5"/>
+          <line x1="261" y1="20" x2="261" y2="190" opacity=".5"/>
+          <line x1="30" y1="147" x2="340" y2="147" opacity=".5"/>
+          <line x1="30" y1="105" x2="340" y2="105" opacity=".5"/>
+          <line x1="30" y1="62" x2="340" y2="62" opacity=".5"/>
+        </g>
+        <!-- linear reference -->
+        <line x1="30" y1="190" x2="340" y2="20" stroke="#473628" stroke-width="1" stroke-dasharray="3 4"/>
+        <!-- handle arms -->
+        <line id="armA" x1="30" y1="190" x2="120" y2="178" stroke="#7a5f1a" stroke-width="1.5"/>
+        <line id="armB" x1="340" y1="20" x2="250" y2="32" stroke="#7a5f1a" stroke-width="1.5"/>
+        <!-- curve -->
+        <path id="curvePath" d="M30,190 C120,178 250,32 340,20" fill="none" stroke="url(#cg)" stroke-width="3.5" stroke-linecap="round"/>
+        <!-- handles -->
+        <circle id="hA" cx="120" cy="178" r="5" fill="#FAC719"/>
+        <circle id="hB" cx="250" cy="32" r="5" fill="#FAC719"/>
+        <!-- traveling dot -->
+        <circle id="travel" r="5.5" fill="#fff">
+          <animateMotion id="trav" dur="2.6s" repeatCount="indefinite" rotate="0" keyPoints="0;1" keyTimes="0;1" calcMode="spline" keySplines="0.85 0 0.15 1">
+            <mpath href="#curvePath"/>
+          </animateMotion>
+        </circle>
+      </svg>
+      <div class="curve-read">in <b>0.85</b> / 0.00 &nbsp;·&nbsp; out <b>0.15</b> / 1.00</div>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== WHY ===================== -->
+<section class="band" id="why">
+  <div class="wrap">
+    <div class="seclabel"><span class="bar"></span><span class="eyebrow">The problem</span></div>
+    <div class="manifesto">
+      <div class="big">
+        Editing in After Effects is <em>death by a thousand clicks</em> — right-click menus, memorized shortcuts, the same setup steps on every comp.
+      </div>
+      <div>
+        <div class="note">
+          <div class="k">What I got wrong</div>
+          <p>The first build crammed everything into one do-everything panel with too many options. Powerful, but nobody could learn it at a glance.</p>
+        </div>
+        <div class="note">
+          <div class="k">What changed</div>
+          <p>I split it into two focused panels — one for workflow actions, one for motion — each laid out so the button you want is where you'd expect it, with hover and click feedback so it feels responsive.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PANELS ===================== -->
+<section class="band" id="panels">
+  <div class="wrap">
+    <div class="seclabel"><span class="bar"></span><span class="eyebrow">Two panels</span></div>
+    <h2>One for the work. One for the motion.</h2>
+    <p class="sub" style="margin-bottom:38px">Both ship as a single self-contained <span class="mono" style="color:var(--cream-dim)">.jsx</span> that docks as a ScriptUI panel or runs as a floating palette — same file, either way.</p>
+
+    <div class="panels">
+      <div class="pcard tools">
+        <div class="shot"><img src="assets/tools.png" alt="Rio Tools panel in After Effects" /></div>
+        <div class="body">
+          <div class="tag">Rio Tools · v1.0</div>
+          <h3>Rio Tools</h3>
+          <p>The common moves — align, pre-comp, create, fit, freeze, effects, render — grouped by task and reduced to one click each.</p>
+          <div class="chips">
+            <span class="chip">Align</span><span class="chip">Create</span><span class="chip">Modify</span><span class="chip">Effects</span><span class="chip">Export</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pcard flow">
+        <div class="shot"><img src="assets/flow.png" alt="Rio Flow easing panel in After Effects" /></div>
+        <div class="body">
+          <div class="tag">Rio Flow · v3.1</div>
+          <h3>Rio Flow</h3>
+          <p>Easing presets you apply to keyframes in a click — ease, quad, expo, back, bounce, overshoot — plus a live curve preview and a custom curve builder.</p>
+          <div class="chips">
+            <span class="chip">15 presets</span><span class="chip">Live curve</span><span class="chip">Custom</span><span class="chip">Easy Ease</span><span class="chip">Linearize</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TOOLS BREAKDOWN ===================== -->
+<section class="band">
+  <div class="wrap">
+    <div class="seclabel"><span class="bar" style="background:var(--tools-blue)"></span><span class="eyebrow" style="color:var(--tools-blue)">Inside Rio Tools</span></div>
+    <h2>Five sections, one click each.</h2>
+    <p class="sub" style="margin-bottom:30px">Every action runs inside a single undo group, so <span class="mono" style="color:var(--cream-dim)">Cmd/Ctrl&nbsp;+&nbsp;Z</span> always backs it out cleanly.</p>
+    <div class="breakdown">
+      <div class="feat">
+        <div class="h"><span class="dot" style="background:var(--tools-blue)"></span><span class="n">Align</span><span class="c">9 buttons</span></div>
+        <p>A 3×3 grid — top/middle/bottom × left/center/right. Reads anchor point and scale to land the layer correctly, in both 2D and 3D. Center In Comp is tinted to stand out.</p>
+      </div>
+      <div class="feat">
+        <div class="h"><span class="dot" style="background:#38CC7D"></span><span class="n">Create</span><span class="c">7 buttons</span></div>
+        <p>Solid, shape, text, null, camera, point light, adjustment layer — added straight to the active comp through native AE scripting, no extra dialogs.</p>
+      </div>
+      <div class="feat">
+        <div class="h"><span class="dot" style="background:var(--rust-bright)"></span><span class="n">Modify</span><span class="c">6 buttons</span></div>
+        <p>Pre-Comp, Center, Fit To Comp, Mirror, Freeze Frame (hold keyframes via time-remap), and Enable Motion Blur on both the layer and the comp switch.</p>
+      </div>
+      <div class="feat">
+        <div class="h"><span class="dot" style="background:#9961FF"></span><span class="n">Effects</span><span class="c">12 buttons</span></div>
+        <p>Lumetri, Curves, Hue/Sat, Levels, Brightness, Tint, Fill, Glow, Drop Shadow, Gaussian &amp; Lens Blur, Keylight — each applied by its exact internal matchName.</p>
+      </div>
+      <div class="feat">
+        <div class="h"><span class="dot" style="background:#E64848"></span><span class="n">Export</span><span class="c">1 button</span></div>
+        <p>Save Current Frame drops a render-queue item at the playhead — ready to render with one more click from the queue.</p>
+      </div>
+      <div class="feat" style="border-style:dashed;background:transparent">
+        <div class="h"><span class="dot" style="background:var(--muted-2)"></span><span class="n">Retheme</span><span class="c">~line 55</span></div>
+        <p>One <span class="mono">C{}</span> colour block and named <span class="mono">BTN_*_H</span> height constants up top. Change the look without touching a line of logic.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FLOW BREAKDOWN ===================== -->
+<section class="band">
+  <div class="wrap">
+    <div class="seclabel"><span class="bar" style="background:var(--flow-gold)"></span><span class="eyebrow" style="color:var(--flow-gold)">Inside Rio Flow</span></div>
+    <h2>Pick a curve. Watch it draw.</h2>
+    <p class="sub" style="margin-bottom:30px">A live ScriptUI canvas redraws a bezier approximation of the selected preset on every click — a graph-editor feel within ScriptUI's limits.</p>
+    <div class="breakdown">
+      <div class="feat">
+        <div class="h"><span class="dot" style="background:var(--flow-gold)"></span><span class="n">15 presets</span></div>
+        <p>Tuned speed + influence pairs: standard eases, polynomial curves (quad / cubic / expo), anticipation (back in/out, overshoot), and character presets — Bounce-ish, Smooth Pop, Snappy.</p>
+      </div>
+      <div class="feat">
+        <div class="h"><span class="dot" style="background:var(--flow-gold)"></span><span class="n">Live preview</span></div>
+        <p>The curve canvas draws handle arms, a linear reference diagonal, and grid lines, then repaints the moment you switch presets.</p>
+      </div>
+      <div class="feat">
+        <div class="h"><span class="dot" style="background:var(--flow-gold)"></span><span class="n">Custom curve</span></div>
+        <p>Dial in name, in/out influence and speed, then Save Preset to add it as a new button for the session.</p>
+      </div>
+      <div class="feat">
+        <div class="h"><span class="dot" style="background:var(--flow-gold)"></span><span class="n">Utilities</span></div>
+        <p>Easy Ease, Linearize, Copy Current Settings, and Reset Fields — the small moves you reach for between every keyframe pass.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== INSTALL ===================== -->
+<section class="band" id="install">
+  <div class="wrap">
+    <div class="seclabel"><span class="bar"></span><span class="eyebrow">Install</span></div>
+    <h2>Drop in, restart, dock.</h2>
+    <p class="sub" style="margin-bottom:30px">Both panels install the same way. Save the file, copy it into the ScriptUI Panels folder, restart After Effects.</p>
+
+    <div class="install-grid">
+      <div class="code">
+        <div class="ct"><span>macOS</span><span>ScriptUI Panels</span></div>
+<pre><span class="c"># Applications → After Effects [ver]</span>
+Scripts/<span class="p">ScriptUI Panels</span>/
+   Rio_Tools.jsx
+   Rio_Flow.jsx</pre>
+      </div>
+      <div class="code">
+        <div class="ct"><span>Windows</span><span>ScriptUI Panels</span></div>
+<pre><span class="c"># Program Files → Adobe → After Effects [ver]</span>
+Support Files/Scripts/<span class="p">ScriptUI Panels</span>/
+   Rio_Tools.jsx
+   Rio_Flow.jsx</pre>
+      </div>
+    </div>
+
+    <ol class="steps">
+      <li>Download <code>Rio_Tools.jsx</code> and <code>Rio_Flow.jsx</code> from the repo.</li>
+      <li>Copy them into the <code>ScriptUI Panels</code> folder shown above.</li>
+      <li>Restart After Effects.</li>
+      <li>Open from <code>Window &gt; Rio_Tools.jsx</code> or <code>Window &gt; Rio_Flow.jsx</code>, then dock anywhere.</li>
+    </ol>
+    <p class="sub mono" style="font-size:13px;margin-top:18px;color:var(--muted-2)">First run blocked? In After Effects → Preferences → Scripting &amp; Expressions, enable “Allow Scripts to Write Files and Access Network.”</p>
+  </div>
+</section>
+
+<!-- ===================== CLOSING ===================== -->
+<section class="band">
+  <div class="wrap closing">
+    <div class="seclabel" style="justify-content:center"><span class="bar"></span><span class="eyebrow">Field notes</span></div>
+    <p class="pull">Building my own panels showed me most of my creative block was just friction. <span>Remove the clicks and the work starts moving on its own.</span></p>
+    <div class="by">— Rio</div>
+    <div class="cta-row" style="justify-content:center;margin-top:34px">
+      <a class="btn btn-primary" href="https://github.com/YOUR_USERNAME/rio-panels" target="_blank" rel="noopener">Get the panels ↗</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="l">
+      <img src="assets/logo.png" alt="Rio logo" />
+      <span>Rio Panels — built for After Effects · MIT licensed</span>
+    </div>
+    <div class="status"><span class="d"></span>Tools v1.0 · Flow v3.1</div>
+  </div>
+</footer>
+
+<script>
+  // Hover the curve card → nudge handles + dot to an "overshoot" curve, then ease back.
+  (function(){
+    var card = document.querySelector('.curve-card');
+    var path = document.getElementById('curvePath');
+    var hA = document.getElementById('hA'), hB = document.getElementById('hB');
+    var armA = document.getElementById('armA'), armB = document.getElementById('armB');
+    if(!card || !path) return;
+    var base = "M30,190 C120,178 250,32 340,20";
+    var over = "M30,190 C150,196 230,-18 340,20"; // exaggerated overshoot
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function set(d, a, b){
+      path.setAttribute('d', d);
+      hA.setAttribute('cx', a[0]); hA.setAttribute('cy', a[1]);
+      hB.setAttribute('cx', b[0]); hB.setAttribute('cy', b[1]);
+      armA.setAttribute('x2', a[0]); armA.setAttribute('y2', a[1]);
+      armB.setAttribute('x2', b[0]); armB.setAttribute('y2', b[1]);
+    }
+    if(reduce){
+      var anim = document.getElementById('trav');
+      if(anim && anim.parentNode) anim.parentNode.removeChild(anim);
+      return;
+    }
+    card.addEventListener('mouseenter', function(){ set(over,[150,196],[230,-18]); });
+    card.addEventListener('mouseleave', function(){ set(base,[120,178],[250,32]); });
+  })();
+</script>
+
+</body>
+</html>
